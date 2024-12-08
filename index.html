@@ -193,47 +193,27 @@
                     window.unityInstance.SendMessage('ARCamera', 'OnStartWebcamFail');
                 }  
             }
-            async function LoadWebcams(){
-                let camDevices = [];
-                // let backCams = [];
-                let devices = await navigator.mediaDevices.enumerateDevices();
-                var ctr = 0;
-                devices.forEach(mediaDevice => {
-                    if (mediaDevice.kind === 'videoinput') {
+            async function LoadWebcams() {
+    let camDevices = [];
+    let devices = await navigator.mediaDevices.enumerateDevices();
 
-                        if(window.unityFacingMode == 'environment' && !mediaDevice.label.includes('facing front')){
-                            //back cam only
-                            camDevices.push(mediaDevice);
-                        }
-                        else if(window.unityFacingMode == 'user' && mediaDevice.label.includes('facing front')){
-                            //front cam only
-                            camDevices.push(mediaDevice);
-                        }
-                        else{
-                            //back and front
-                            camDevices.push(mediaDevice);
-                        }   
-                        
-                        ctr++;
-                    }
-                });
-                var select = document.getElementById("chooseCamSel");
-                select.style.display = "block";
-                var count = 0;
-                camDevices.forEach(mediaDevice => {
-                    const option = document.createElement('option');
-                    option.value = mediaDevice.deviceId;
-                    let label = `Camera ${count}`;
-                    if (mediaDevice.label) {
-                        label = mediaDevice.label
-                    }
-                    const textNode = document.createTextNode(label);
-                    option.appendChild(textNode);
-                    select.appendChild(option);
-                    count++;
-                });
-                // iTracker.WEBCAM_NAME = select.options[select.selectedIndex].innerHTML;
-            }
+    devices.forEach(mediaDevice => {
+        if (mediaDevice.kind === 'videoinput') {
+            camDevices.push(mediaDevice);
+        }
+    });
+
+    if (camDevices.length > 0) {
+        // Seleciona automaticamente a primeira câmera
+        window.WEBCAM_SETTINGS.video['deviceId'] = camDevices[0].deviceId;
+
+        // Inicia a webcam automaticamente
+        RequestWebcam();
+    } else {
+        console.error("Nenhuma câmera foi encontrada.");
+        ShowError("Nenhuma câmera foi encontrada.");
+    }
+}
             function SelectCam(){
                 var select = document.getElementById("chooseCamSel");
                 const deviceId = select.value;
