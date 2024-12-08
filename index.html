@@ -87,14 +87,8 @@
         );
 
         console.log("FaceTracker inicializado!");
-    } catch (error) {
-        console.error("Falha ao inicializar o FaceTracker: ", error);
-        ShowError("Falha ao inicializar a experiência.");
-        return;
-    }
 
-    // Tente acessar a câmera automaticamente
-    try {
+        // Tente acessar a câmera automaticamente
         let devices = await navigator.mediaDevices.enumerateDevices();
         let camDevices = devices.filter(device => device.kind === 'videoinput');
 
@@ -109,8 +103,8 @@
             ShowError("Nenhuma câmera encontrada.");
         }
     } catch (error) {
-        console.error("Erro ao carregar webcams: ", error);
-        ShowError("Erro ao acessar dispositivos de câmera.");
+        console.error("Erro durante a inicialização: ", error);
+        ShowError("Falha ao inicializar a experiência.");
     }
 };
 
@@ -161,18 +155,27 @@
             window.requestingForPermissions = false;
             async function RequestWebcam() {
     try {
+        // Solicita o acesso à webcam com as configurações especificadas
         window.webcamStream = await navigator.mediaDevices.getUserMedia(window.WEBCAM_SETTINGS);
+        
+        // Configura o vídeo da webcam
         const video = document.querySelector("#webcam-video");
         video.srcObject = webcamStream;
+
         console.log("Webcam acessada com sucesso!");
 
         // Configura o ARCamera
         arCamera.setFlipped(window.WEBCAM_SETTINGS.video.facingMode === 'user');
         await arCamera.startWebcam(video);
 
-        console.log("Webcam inicializada.");
+        console.log("Webcam inicializada com sucesso.");
+
+        // Garanta que a mensagem de erro não seja exibida
+        document.getElementById("errorDiv").style.display = "none";
     } catch (err) {
         console.error("Erro ao acessar a webcam: ", err);
+
+        // Exibe a mensagem de erro caso haja falha
         ShowError("Falha ao acessar a câmera. Permissão negada ou dispositivo indisponível.");
     }
 }
